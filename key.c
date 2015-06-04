@@ -74,10 +74,8 @@ int st_key_getlimit(void)
 }
 
 
-int st_thread_setspecific(int key, void *value)
+int st_thread_setspecific_thread(_st_thread_t *me, int key, void *value)
 {
-  _st_thread_t *me = _ST_CURRENT_THREAD();
-
   if (key < 0 || key >= key_max) {
     errno = EINVAL;
     return -1;
@@ -94,6 +92,11 @@ int st_thread_setspecific(int key, void *value)
   return 0;
 }
 
+int st_thread_setspecific(int key, void *value)
+{
+  _st_thread_t *me = _ST_CURRENT_THREAD();
+  return st_thread_setspecific_thread(me, key, value);
+}
 
 void *st_thread_getspecific(int key)
 {
@@ -103,6 +106,13 @@ void *st_thread_getspecific(int key)
   return ((_ST_CURRENT_THREAD())->private_data[key]);
 }
 
+void *st_thread_getspecific_thread(_st_thread_t *thread, int key)
+{
+  if (key < 0 || key >= key_max)
+    return NULL;
+
+  return (thread->private_data[key]);
+}
 
 /*
  * Free up all per-thread private data

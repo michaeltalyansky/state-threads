@@ -124,7 +124,9 @@ extern int st_mutex_trylock(st_mutex_t lock);
 extern int st_key_create(int *keyp, void (*destructor)(void *));
 extern int st_key_getlimit(void);
 extern int st_thread_setspecific(int key, void *value);
+extern int st_thread_setspecific_thread(st_thread_t thread, int key, void *value);
 extern void *st_thread_getspecific(int key);
+extern void *st_thread_getspecific_thread(st_thread_t thread, int key);
 
 extern st_netfd_t st_netfd_open(int osfd);
 extern st_netfd_t st_netfd_open_socket(int osfd);
