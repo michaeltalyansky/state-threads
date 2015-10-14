@@ -142,7 +142,7 @@ static __thread struct _st_epolldata {
 #define _ST_EPOLL_EXCEP_CNT(fd)  (_st_epoll_data->fd_data[fd].ex_ref_cnt)
 #define _ST_EPOLL_REVENTS(fd)    (_st_epoll_data->fd_data[fd].revents)
 
-#define _ST_EPOLL_READ_BIT(fd)   (_ST_EPOLL_READ_CNT(fd) ? EPOLLIN : 0)
+#define _ST_EPOLL_READ_BIT(fd)   (_ST_EPOLL_READ_CNT(fd) ? (EPOLLIN|EPOLLRDHUP) : 0)
 #define _ST_EPOLL_WRITE_BIT(fd)  (_ST_EPOLL_WRITE_CNT(fd) ? EPOLLOUT : 0)
 #define _ST_EPOLL_EXCEP_BIT(fd)  (_ST_EPOLL_EXCEP_CNT(fd) ? EPOLLPRI : 0)
 #define _ST_EPOLL_EVENTS(fd) \
