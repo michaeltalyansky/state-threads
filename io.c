@@ -44,6 +44,7 @@
 #include <unistd.h>
 #include <sys/types.h>
 #include <sys/socket.h>
+#include <sys/sendfile.h>
 #include <sys/ioctl.h>
 #include <sys/uio.h>
 #include <sys/time.h>
@@ -436,6 +437,26 @@ int st_connect(_st_netfd_t *fd, const struct sockaddr *addr, int addrlen,
   return 0;
 }
 
+ssize_t st_sendfile(st_netfd_t out_fd, st_netfd_t in_fd, off_t *off, size_t count, st_utime_t timeout)
+{
+  ssize_t sent = 0, thisround;
+  off_t offset = off ? *off : 0;
+
+  while (sent < count) {
+    while ((thisround = sendfile(out_fd->osfd, in_fd->osfd, &offset, (count - sent))) < 0) {
+      if (errno == EINTR)
+        continue;
+      if (!_IO_NOT_READY_ERROR)
+        return -1;
+      /* Wait until the socket becomes writable */
+      if (st_netfd_poll(out_fd, POLLOUT, timeout) < 0)
+        return -1;
+    }
+    //fprintf(stderr, "thisgo: %ld bytes\n", thisround);
+    sent += thisround;
+  }
+  return sent;
+}
 
 ssize_t st_read(_st_netfd_t *fd, void *buf, size_t nbyte, st_utime_t timeout)
 {

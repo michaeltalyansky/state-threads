@@ -154,6 +154,7 @@ extern ssize_t st_readv(st_netfd_t fd, const struct iovec *iov, int iov_size,
 			st_utime_t timeout);
 extern int st_readv_resid(st_netfd_t fd, struct iovec **iov, int *iov_size,
 			  st_utime_t timeout);
+extern ssize_t st_sendfile(st_netfd_t out_fd, st_netfd_t in_fd, off_t *offset, size_t count, st_utime_t timeout);
 extern ssize_t st_write(st_netfd_t fd, const void *buf, size_t nbyte,
 			st_utime_t timeout);
 extern int st_write_resid(st_netfd_t fd, const void *buf, size_t *resid,
