@@ -536,6 +536,11 @@ void st_thread_interrupt(_st_thread_t *thread)
 }
 
 
+extern unsigned long  __pointer_chk_guard;
+#  define PTR_MANGLE(var) \
+  (var) = (__typeof (var)) ((unsigned long) (var) ^ __pointer_chk_guard)
+#  define PTR_DEMANGLE(var)     PTR_MANGLE (var)
+
 _st_thread_t *st_thread_create(void *(*start)(void *arg), void *arg,
 			       int joinable, int stk_size)
 {
@@ -607,7 +612,13 @@ _st_thread_t *st_thread_create(void *(*start)(void *arg), void *arg,
   thread->arg = arg;
 
 #ifndef __ia64__
+#if defined(__arm__)
+  volatile void * l = PTR_MANGLE(stack->sp);
+{ if (_setjmp ((thread)->context)) _st_thread_main();
+  (thread)->context[0].__jmpbuf[8] = (long) (l); };
+#else
   _ST_INIT_CONTEXT(thread, stack->sp, _st_thread_main);
+#endif
 #else
   _ST_INIT_CONTEXT(thread, stack->sp, stack->bsp, _st_thread_main);
 #endif
